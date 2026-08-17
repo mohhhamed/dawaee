@@ -1,0 +1,9 @@
+# مجلد العمل المؤقت للجلسة (ملفات مؤقتة لا تُدفع للمستودع)
+scratchpad/
+
+# مخرجات بناء Gradle / Android
+.gradle/
+build/
+*.apk
+local.properties
+.idea/
