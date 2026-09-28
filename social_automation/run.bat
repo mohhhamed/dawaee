@@ -23,9 +23,19 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 echo [2/3] Installing requirements... please wait 1-3 minutes...
-call ".venv\Scripts\activate.bat"
-python -m pip install --upgrade pip --quiet --no-cache-dir --disable-pip-version-check
-pip install -r requirements.txt --no-cache-dir --disable-pip-version-check
+".venv\Scripts\python.exe" -m pip install --upgrade pip --quiet --no-cache-dir --disable-pip-version-check
+".venv\Scripts\python.exe" -m pip install -r requirements.txt --no-cache-dir --disable-pip-version-check
+
+REM Verify install succeeded before starting the server
+".venv\Scripts\python.exe" -c "import uvicorn, fastapi, pydantic" 2>nul
+if errorlevel 1 (
+    echo.
+    echo ERROR: Some packages failed to install. Scroll up to see the reason.
+    echo Common cause: a very new Python version. Python 3.12 or 3.13 is the safest.
+    echo.
+    pause
+    exit /b 1
+)
 
 if not exist ".env" copy ".env.example" ".env" >nul
 
