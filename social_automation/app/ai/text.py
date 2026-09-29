@@ -5,7 +5,7 @@
 """
 import random
 
-from ..config import settings
+from .. import runtime_settings as rs
 
 # قوالب تجريبية بسيطة حسب الصيغة
 _TEMPLATES = {
@@ -27,7 +27,7 @@ _TEMPLATES = {
 def generate_caption(brand_name: str, analysis: str, fmt: str = "post",
                      tone: str = "", hashtags: str = "") -> dict:
     """يعيد dict فيه caption و hashtags."""
-    if settings.is_mock or not (settings.ANTHROPIC_API_KEY or settings.OPENAI_API_KEY):
+    if rs.is_mock() or not (rs.get("ANTHROPIC_API_KEY") or rs.get("OPENAI_API_KEY")):
         topic = (analysis.split("|")[0].replace("الموضوع المستخلص:", "").strip()
                  or "منتجاتنا")
         template = random.choice(_TEMPLATES.get(fmt, _TEMPLATES["post"]))

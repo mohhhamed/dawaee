@@ -7,7 +7,7 @@ import time
 
 import httpx
 
-from ..config import settings
+from .. import runtime_settings as rs
 
 GRAPH = "https://graph.facebook.com/v21.0"
 
@@ -15,7 +15,7 @@ GRAPH = "https://graph.facebook.com/v21.0"
 def publish(ig_user_id: str, page_token: str, caption: str,
             media_url: str, fmt: str = "post") -> dict:
     """ينشر على إنستغرام ويعيد {'id':..., 'ok':bool}."""
-    if settings.is_mock or not (ig_user_id and page_token and media_url):
+    if rs.is_mock() or not (ig_user_id and page_token and media_url):
         return {"ok": True, "id": f"ig_mock_{int(time.time())}", "mock": True}
 
     # --- وضع live ---

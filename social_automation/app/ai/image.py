@@ -6,7 +6,7 @@
 """
 from urllib.parse import quote
 
-from ..config import settings
+from .. import runtime_settings as rs
 
 
 def generate_image(prompt: str, fmt: str = "post") -> str:
@@ -14,7 +14,7 @@ def generate_image(prompt: str, fmt: str = "post") -> str:
     # أبعاد مناسبة لكل صيغة
     size = {"post": "1080x1080", "story": "1080x1920", "reel": "1080x1920"}.get(fmt, "1080x1080")
 
-    if settings.is_mock or not settings.IMAGE_API_KEY:
+    if rs.is_mock() or not rs.get("IMAGE_API_KEY"):
         w, h = size.split("x")
         label = quote((prompt or "content")[:40])
         # صورة نائبة تُظهر النص والأبعاد — لا تتطلب أي مفتاح

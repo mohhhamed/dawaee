@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة تحكم أتمتة السوشيال ميديا</title>
+<style>
+  :root{
+    --bg:#f4f6f7; --surface:#ffffff; --surface-2:#eef1f2; --border:#dce1e3;
+    --ink:#182225; --ink-soft:#4c595d; --ink-faint:#78888d;
+    --accent:#0e9c8a; --accent-ink:#0a6f62; --accent-wash:#e1f2ef;
+    --amber:#c9781f; --amber-wash:#f6ecdd;
+    --ok:#2f8f5b; --warn:#c9781f; --stop:#c0483c;
+    --shadow:0 1px 2px rgba(16,32,36,.05),0 8px 24px rgba(16,32,36,.06);
+    --r:12px;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#0f1516; --surface:#161d1f; --surface-2:#1d2628; --border:#28353a;
+    --ink:#e8eded; --ink-soft:#aebac0; --ink-faint:#7f8f95;
+    --accent:#2bbdaa; --accent-ink:#7fe0d2; --accent-wash:#12302c;
+    --amber:#e0a35a; --amber-wash:#3a2c17;
+    --ok:#57bb84; --warn:#e0a35a; --stop:#e07a6c;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.4);
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI","Noto Sans Arabic",Tahoma,system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 16px 60px}
+  a{color:var(--accent-ink)}
+  .fv{font-variant-numeric:tabular-nums}
+
+  header{position:sticky;top:0;z-index:20;background:var(--surface);
+    border-bottom:1px solid var(--border);box-shadow:var(--shadow)}
+  .bar{max-width:1000px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+  .bar h1{font-size:18px;margin:0;font-weight:800;flex:1}
+  .pill{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;border:1px solid var(--border)}
+  .pill.mock{background:var(--amber-wash);color:var(--amber)}
+  .pill.live{background:var(--accent-wash);color:var(--accent-ink)}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+  .tab{padding:9px 16px;border-radius:10px;border:1px solid var(--border);background:var(--surface);
+    cursor:pointer;font-weight:700;font-size:15px;color:var(--ink-soft)}
+  .tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+    padding:18px;margin:14px 0;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 4px;font-size:17px;font-weight:800}
+  .card .sub{color:var(--ink-faint);font-size:13.5px;margin:0 0 14px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .stat{background:var(--surface-2);border-radius:10px;padding:12px;text-align:center}
+  .stat b{display:block;font-size:22px;font-weight:800}
+  .stat span{font-size:12.5px;color:var(--ink-faint)}
+  @media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  label{display:block;font-size:13.5px;font-weight:700;margin:10px 0 4px;color:var(--ink-soft)}
+  input,textarea,select{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:9px;
+    background:var(--bg);color:var(--ink);font:inherit}
+  textarea{min-height:70px;resize:vertical}
+  .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .row2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:560px){.row,.row2{grid-template-columns:1fr}}
+
+  button{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 16px;
+    font:inherit;font-weight:700;cursor:pointer}
+  button:hover{filter:brightness(1.05)}
+  button.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border)}
+  button.danger{background:transparent;color:var(--stop);border:1px solid var(--border);padding:5px 10px;font-size:13px}
+  button.sm{padding:6px 12px;font-size:13.5px}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+
+  .bank{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .asset{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface-2)}
+  .asset img{width:100%;height:130px;object-fit:cover;display:block;background:#0002}
+  .asset .body{padding:10px}
+  .asset .fmt{font-size:11px;font-weight:800;color:var(--accent-ink);text-transform:uppercase}
+  .asset textarea{min-height:56px;font-size:13px;margin-top:4px}
+  .asset .acts{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+  .used{font-size:11px;color:var(--ink-faint)}
+
+  .post{display:flex;gap:12px;align-items:center;border:1px solid var(--border);border-radius:10px;
+    padding:10px;margin-bottom:8px;background:var(--surface-2)}
+  .post img{width:56px;height:56px;object-fit:cover;border-radius:8px;flex:0 0 auto}
+  .post .meta{flex:1;min-width:0}
+  .post .cap{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .badge{font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px}
+  .s-scheduled{background:var(--amber-wash);color:var(--amber)}
+  .s-published{background:var(--accent-wash);color:var(--accent-ink)}
+  .s-failed{background:color-mix(in srgb,var(--stop) 15%,transparent);color:var(--stop)}
+  .fmt-tag{font-size:11px;color:var(--ink-faint)}
+
+  .modal{position:fixed;inset:0;background:#0007;display:none;z-index:50;padding:20px;overflow:auto}
+  .modal.on{display:block}
+  .sheet{max-width:560px;margin:30px auto;background:var(--surface);border-radius:14px;
+    padding:22px;box-shadow:var(--shadow)}
+  .sheet h2{margin:0 0 12px}
+  .hint{font-size:12.5px;color:var(--ink-faint);margin:2px 0 0}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);
+    color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:700;opacity:0;transition:.3s;z-index:99}
+  .toast.on{opacity:1}
+  .empty{color:var(--ink-faint);font-size:14px;padding:14px;text-align:center}
+  .switch{display:flex;gap:8px;align-items:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>أتمتة السوشيال ميديا</h1>
+    <span id="modePill" class="pill mock" onclick="openSettings()">…</span>
+    <button class="ghost sm" onclick="loadAll()">تحديث</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="tabs" class="tabs"></div>
+  <div id="panel"></div>
+</div>
+
+<!-- نافذة الإعدادات والمفاتيح -->
+<div id="settingsModal" class="modal">
+  <div class="sheet">
+    <h2>الإعدادات والمفاتيح</h2>
+    <label>وضع التشغيل</label>
+    <select id="set_mode">
+      <option value="mock">تجريبي (Mock) — دون نشر حقيقي أو مفاتيح</option>
+      <option value="live">مباشر (Live) — نشر حقيقي (يتطلب المفاتيح)</option>
+    </select>
+    <p class="hint">في الوضع التجريبي يعمل كل شيء دون أي مفتاح مدفوع.</p>
+
+    <label>مفتاح Anthropic (Claude) — لتوليد النصوص</label>
+    <input id="set_ANTHROPIC_API_KEY" placeholder="اتركه فارغًا للوضع التجريبي">
+    <label>مفتاح OpenAI (بديل للنصوص)</label>
+    <input id="set_OPENAI_API_KEY" placeholder="اختياري">
+    <label>مفتاح توليد الصور</label>
+    <input id="set_IMAGE_API_KEY" placeholder="اختياري">
+    <label>مفتاح تحليل الرؤية (Vision)</label>
+    <input id="set_VISION_API_KEY" placeholder="اختياري">
+
+    <div class="btnrow" style="justify-content:flex-end;margin-top:16px">
+      <button class="ghost" onclick="closeSettings()">إغلاق</button>
+      <button onclick="saveSettings()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let brands = [];
+let current = null;
+
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");
+  setTimeout(()=>t.classList.remove("on"),1800);}
+async function api(url, opts){const r=await fetch(url,opts);
+  if(!r.ok){toast("خطأ: "+r.status);throw new Error(r.status);}return r.json();}
+
+// ---------------- تحميل عام ----------------
+async function loadAll(){
+  const s = await api("/api/settings");
+  const live = (s.APP_MODE==="live");
+  const pill=$("#modePill");
+  pill.textContent = live ? "مباشر ●" : "تجريبي ●";
+  pill.className = "pill "+(live?"live":"mock");
+
+  brands = await api("/api/brands");
+  if(!current && brands.length) current = brands[0].slug;
+  renderTabs();
+  if(current) renderBrand(current);
+}
+
+function renderTabs(){
+  $("#tabs").innerHTML = brands.map(b=>
+    `<div class="tab ${b.slug===current?'on':''}" onclick="selectBrand('${b.slug}')">${b.name}</div>`
+  ).join("");
+}
+function selectBrand(slug){current=slug;renderTabs();renderBrand(slug);}
+
+// ---------------- لوحة علامة ----------------
+async function renderBrand(slug){
+  const b = await api("/api/brands/"+slug);
+  const timesStr = f => (b.times[f]||[]).join("، ");
+  $("#panel").innerHTML = `
+    <div class="card">
+      <h2>${b.name} — ${b.field}</h2>
+      <p class="sub">الحالة اليومية والتحكم السريع</p>
+      <div class="stats">
+        <div class="stat"><b class="fv">${b.bank_unused}</b><span>بنك المحتوى</span></div>
+        <div class="stat"><b class="fv">${b.scheduled}</b><span>مجدول</span></div>
+        <div class="stat"><b class="fv">${b.published}</b><span>منشور</span></div>
+        <div class="stat"><b>${b.daily_posts}/${b.daily_stories}/${b.daily_reels}</b><span>يوميًا (منشور/ستوري/ريلز)</span></div>
+      </div>
+      <div class="btnrow">
+        <button onclick="planDay('${slug}')">خطّط اليوم</button>
+        <button class="ghost" onclick="runNow()">نشر فوري (اختبار)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>إضافة محتوى وتوليده</h2>
+      <p class="sub">اكتب وصفًا وارفع صورة (أو ضع رابطًا)، ثم ولّد منشورات وصورًا تلقائيًا.</p>
+      <label>الوصف</label>
+      <textarea id="src_desc" placeholder="مثال: طاولة طعام خشبية فاخرة بتصميم عصري"></textarea>
+      <div class="row2">
+        <div>
+          <label>رفع صورة</label>
+          <input type="file" id="src_file" accept="image/*" onchange="uploadImg(this)">
+        </div>
+        <div>
+          <label>أو رابط صورة</label>
+          <input id="src_img" placeholder="https://...">
+        </div>
+      </div>
+      <div id="src_preview"></div>
+      <div class="btnrow"><button onclick="addSource('${slug}')">حلّل وولّد المحتوى</button></div>
+    </div>
+
+    <div class="card">
+      <h2>بنك المحتوى</h2>
+      <p class="sub">راجع المحتوى المولّد، عدّل النص، أو احذف قبل الجدولة.</p>
+      <div id="bank" class="bank"><div class="empty">جارِ التحميل…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>المنشورات المجدولة</h2>
+      <div id="posts"><div class="empty">جارِ التحميل…</div></div>
+    </div>
+
+    <div class="card">
+      <h2>إعدادات العلامة</h2>
+      <p class="sub">النبرة والأوقات والكمّيات وحسابات Meta — تُحفظ فورًا.</p>
+      <div class="row2">
+        <div><label>الاسم</label><input id="b_name" value="${esc(b.name)}"></div>
+        <div><label>المجال</label><input id="b_field" value="${esc(b.field)}"></div>
+      </div>
+      <label>النبرة</label><input id="b_tone" value="${esc(b.tone)}">
+      <label>الهاشتاغ الثابت</label><input id="b_hashtags" value="${esc(b.hashtags)}">
+      <div class="row">
+        <div><label>منشورات/يوم</label><input type="number" id="b_dp" value="${b.daily_posts}"></div>
+        <div><label>ستوري/يوم</label><input type="number" id="b_ds" value="${b.daily_stories}"></div>
+        <div><label>ريلز/يوم</label><input type="number" id="b_dr" value="${b.daily_reels}"></div>
+      </div>
+      <div class="row">
+        <div><label>أوقات المنشورات</label><input id="b_tp" value="${timesStr('post')}" placeholder="10:00، 14:00"></div>
+        <div><label>أوقات الستوري</label><input id="b_ts" value="${timesStr('story')}" placeholder="12:00، 18:00"></div>
+        <div><label>أوقات الريلز</label><input id="b_tr" value="${timesStr('reel')}" placeholder="21:00"></div>
+      </div>
+      <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
+      <div class="switch"><b>حسابات Meta</b> <span class="hint">${b.fb_page_token?'✅ التوكِن محفوظ':'لم تُضبط بعد'}</span></div>
+      <div class="row">
+        <div><label>معرّف صفحة فيسبوك</label><input id="b_fbid" value="${esc(b.fb_page_id)}"></div>
+        <div><label>معرّف حساب إنستغرام</label><input id="b_igid" value="${esc(b.ig_account_id)}"></div>
+        <div><label>توكِن الصفحة</label><input id="b_fbtok" value="${b.fb_page_token}" placeholder="الصق التوكِن"></div>
+      </div>
+      <div class="btnrow"><button onclick="saveBrand('${slug}')">حفظ الإعدادات</button></div>
+    </div>
+  `;
+  loadBank(slug);
+  loadPosts(slug);
+}
+
+function esc(s){return (s||"").replace(/"/g,'&quot;');}
+
+// ---------------- رفع الصورة ----------------
+async function uploadImg(input){
+  if(!input.files[0])return;
+  const fd=new FormData();fd.append("file",input.files[0]);
+  const r=await api("/api/upload",{method:"POST",body:fd});
+  $("#src_img").value=r.url;
+  $("#src_preview").innerHTML=`<img src="${r.url}" style="max-height:120px;border-radius:8px;margin-top:8px">`;
+  toast("تم رفع الصورة");
+}
+
+// ---------------- إضافة مصدر ----------------
+async function addSource(slug){
+  const desc=$("#src_desc").value.trim();
+  const img=$("#src_img").value.trim();
+  if(!desc && !img){toast("أدخل وصفًا أو صورة");return;}
+  const r=await api("/api/sources",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({brand_slug:slug,description:desc,image_url:img})});
+  toast("وُلّد "+r.generated+" قطعة محتوى");
+  $("#src_desc").value="";$("#src_img").value="";$("#src_preview").innerHTML="";
+  loadBank(slug);loadAll();
+}
+
+// ---------------- بنك المحتوى ----------------
+async function loadBank(slug){
+  const rows=await api("/api/brands/"+slug+"/assets");
+  const el=$("#bank");
+  if(!rows.length){el.innerHTML='<div class="empty">لا يوجد محتوى بعد — أضف مصدرًا في الأعلى.</div>';return;}
+  el.innerHTML=rows.map(a=>`
+    <div class="asset">
+      <img src="${a.media_url}" onerror="this.style.display='none'">
+      <div class="body">
+        <div class="fmt">${a.fmt}${a.used?' • مُستخدَم':''}</div>
+        <textarea onchange="editAsset(${a.id},this.value)">${a.caption}</textarea>
+        <div class="acts">
+          <span class="used">${a.hashtags||''}</span>
+          <button class="danger" onclick="delAsset(${a.id},'${slug}')">حذف</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+async function editAsset(id,caption){await api("/api/assets/"+id,{method:"POST",
+  headers:{"Content-Type":"application/json"},body:JSON.stringify({caption})});toast("حُفظ");}
+async function delAsset(id,slug){await api("/api/assets/"+id,{method:"DELETE"});loadBank(slug);loadAll();}
+
+// ---------------- المنشورات ----------------
+async function loadPosts(slug){
+  const rows=await api("/api/posts?slug="+slug);
+  const el=$("#posts");
+  if(!rows.length){el.innerHTML='<div class="empty">لا منشورات مجدولة — اضغط «خطّط اليوم».</div>';return;}
+  const names={scheduled:"مجدول",published:"منشور",failed:"فشل"};
+  el.innerHTML=rows.map(p=>{
+    const t=p.scheduled_at?new Date(p.scheduled_at).toLocaleString('ar'):'';
+    return `<div class="post">
+      <img src="${p.media_url}" onerror="this.style.visibility='hidden'">
+      <div class="meta">
+        <div class="cap">${p.caption.split("\\n")[0]}</div>
+        <div class="fmt-tag">${p.fmt} • ${t}</div>
+      </div>
+      <span class="badge s-${p.status}">${names[p.status]||p.status}</span>
+      <button class="danger" onclick="delPost(${p.id},'${slug}')">حذف</button>
+    </div>`;}).join("");
+}
+async function delPost(id,slug){await api("/api/posts/"+id,{method:"DELETE"});loadPosts(slug);loadAll();}
+
+// ---------------- أفعال ----------------
+async function planDay(slug){const r=await api("/api/brands/"+slug+"/plan",{method:"POST"});
+  toast("جُدول "+r.scheduled+" منشور");renderBrand(slug);loadAll();}
+async function runNow(){const r=await api("/api/run-now",{method:"POST"});
+  toast("نُشر "+r.published+" (فوري)");if(current)renderBrand(current);loadAll();}
+
+async function saveBrand(slug){
+  const times={
+    post:splitTimes($("#b_tp").value),
+    story:splitTimes($("#b_ts").value),
+    reel:splitTimes($("#b_tr").value),
+  };
+  await api("/api/brands/"+slug,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      name:$("#b_name").value,field:$("#b_field").value,tone:$("#b_tone").value,
+      hashtags:$("#b_hashtags").value,
+      daily_posts:+$("#b_dp").value,daily_stories:+$("#b_ds").value,daily_reels:+$("#b_dr").value,
+      times, fb_page_id:$("#b_fbid").value, ig_account_id:$("#b_igid").value,
+      fb_page_token:$("#b_fbtok").value,
+    })});
+  toast("حُفظت الإعدادات");loadAll();
+}
+function splitTimes(s){return s.split(/[،,]/).map(x=>x.trim()).filter(Boolean);}
+
+// ---------------- الإعدادات ----------------
+async function openSettings(){
+  const s=await api("/api/settings");
+  $("#set_mode").value=s.APP_MODE||"mock";
+  ["ANTHROPIC_API_KEY","OPENAI_API_KEY","IMAGE_API_KEY","VISION_API_KEY"].forEach(k=>{
+    $("#set_"+k).value = s[k]==="configured" ? "configured" : "";
+    $("#set_"+k).placeholder = s[k]==="configured" ? "محفوظ — اتركه لعدم التغيير" : "اختياري";
+  });
+  $("#settingsModal").classList.add("on");
+}
+function closeSettings(){$("#settingsModal").classList.remove("on");}
+async function saveSettings(){
+  const vals={APP_MODE:$("#set_mode").value};
+  ["ANTHROPIC_API_KEY","OPENAI_API_KEY","IMAGE_API_KEY","VISION_API_KEY"].forEach(k=>{
+    vals[k]=$("#set_"+k).value;});
+  await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(vals)});
+  toast("حُفظت الإعدادات");closeSettings();loadAll();
+}
+$("#settingsModal").addEventListener("click",e=>{if(e.target.id==="settingsModal")closeSettings();});
+
+loadAll();
+</script>
+</body>
+</html>

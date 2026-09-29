@@ -9,6 +9,14 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+class AppSetting(Base):
+    """إعدادات عامة قابلة للتعديل من المتصفح (المفاتيح، وضع التشغيل)."""
+    __tablename__ = "app_settings"
+
+    key = Column(String(80), primary_key=True)
+    value = Column(Text, default="")
+
+
 class Brand(Base):
     """علامة تجارية (مثل: بيج رايش، إنكيدو)."""
     __tablename__ = "brands"

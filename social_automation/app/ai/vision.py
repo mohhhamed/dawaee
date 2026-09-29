@@ -3,12 +3,12 @@
 في وضع mock يعيد تحليلًا نصيًا وهميًا حتى تُختبر المنظومة كاملة دون مفاتيح.
 في وضع live: استبدل جسم analyze() باستدعاء مزوّد الرؤية (Claude/GPT vision).
 """
-from ..config import settings
+from .. import runtime_settings as rs
 
 
 def analyze(description: str, image_url: str = "") -> str:
     """يحلّل مُدخل العلامة ويعيد وصفًا للهوية والمحتوى والنبرة."""
-    if settings.is_mock or not settings.VISION_API_KEY:
+    if rs.is_mock() or not rs.get("VISION_API_KEY"):
         parts = []
         if description:
             parts.append(f"الموضوع المستخلص: {description.strip()[:120]}")
